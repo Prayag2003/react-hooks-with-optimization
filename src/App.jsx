@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function App() {
   const [length, setLength] = useState(8);
@@ -6,6 +6,9 @@ function App() {
   const [charsAllowed, setCharsAllowed] = useState(false);
   // we will generate password on page loading
   const [password, setPassword] = useState("");
+
+  // useRef hook
+  const passwordRef = useRef(null);
 
   // NOTE: useCallback -> used to cache the function which has a dependency array on some attributes
   // optimize/cache on either of the changes in the array element
@@ -23,6 +26,16 @@ function App() {
 
     setPassword(pass);
   }, [length, numbersAllowed, charsAllowed, setPassword]);
+
+
+  // useCallback for optimization
+  const copyPasswordToClipBoard = useCallback(() => {
+    // to add selecion highlight
+    passwordRef.current?.select()
+    passwordRef.current?.setSelectionRange(0, 20) // for a specific range
+    // to copy the password to the clipboard
+    window.navigator.clipboard.writeText(password);
+  }, [password]);
 
   // NOTE: UseEffect helps to synchronize with effects
   useEffect(() => {
@@ -42,9 +55,13 @@ function App() {
             className="outline-none w-full py-1 px-4"
             placeholder="Password"
             readOnly
+            ref={passwordRef}
           ></input>
 
-          <button className="outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0">
+          <button
+            onClick={copyPasswordToClipBoard}
+            className="outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0"
+          >
             Copy
           </button>
         </div>
